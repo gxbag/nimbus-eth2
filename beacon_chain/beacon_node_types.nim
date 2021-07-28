@@ -153,4 +153,12 @@ type
     proposingSlots*: array[2, uint32]
     lastCalculatedEpoch*: Epoch
 
+  # #############################################
+  #
+  #              Validator Monitoring
+  #
+  # #############################################
+  EpochSummary* = object
+    attestations*: uint32
+
 func shortLog*(v: AttachedValidator): string = shortLog(v.pubKey)
