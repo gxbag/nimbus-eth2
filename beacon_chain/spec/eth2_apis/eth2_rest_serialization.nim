@@ -5,7 +5,7 @@
 # at your option. This file may not be copied, modified, or distributed except according to those terms.
 
 import
-  std/[typetraits],
+  std/[json, typetraits],
   stew/[results, base10, byteutils, endians2],
   presto,
   libp2p/peerid,
