@@ -9,13 +9,14 @@
 
 import
   std/[deques, intsets, streams, tables],
-  stew/endians2,
+  chronos, stew/endians2,
   ./spec/datatypes/[phase0, altair],
+
   ./consensus_object_pools/block_pools_types,
   ./fork_choice/fork_choice_types,
   ./validators/slashing_protection
 
-export tables, block_pools_types
+export chronos, tables, block_pools_types
 
 const
   ATTESTATION_LOOKBACK* =
@@ -158,7 +159,62 @@ type
   #              Validator Monitoring
   #
   # #############################################
+  # see lighthouse/beacon_node/beacon_chain/src/validator_monitor.rs
   EpochSummary* = object
-    attestations*: uint32
+    #
+    # Attestations with a target in the current epoch.
+    #
+    # Attestations seen.
+    attestations*: uint64
+    # Delay between when the attestation should have been produced and when it was observed.
+    attestationMinDelay*: Option[Duration]
+    # Times a validator's attestation was seen in an aggregate.
+    attestationAggregateInclusions*: uint64
+    # Times a validator's attestation was seen in a block.
+    attestationBlockInclusions*: uint64
+    # Minimum observed inclusion distance for an attestation for this epoch.
+    attestationMinBlockInclusionDistance*: Option[Slot]
+    #
+    # Blocks with a slot in the current epoch.
+    #
+    # Blocks observed.
+    blocks*: uint64
+    # Delay between when the block should have been produced and when it was observed.
+    blockMinDelay*: Option[Duration]
+    #
+    # Aggregates with a target in the current epoch
+    #
+    # Signed aggregate and proofs observed.
+    aggregates*: uint64
+    # Delay between when the aggregate should have been produced and when it was observed.
+    aggregateMinDelay*: Option[Duration]
+    #
+    # Others pertaining to this epoch.
+    #
+    # Voluntary exists observed.
+    exits*: uint64
+    # Proposer slashings observed.
+    proposerSlashings*: uint64
+    # Attester slashings observed.
+    attesterSlashings*: uint64
+
+  SummaryMap* = Table[Epoch, EpochSummary]
+
+  # A validator that is being monitored by the `ValidatorMonitor`.
+  MonitoredValidator* = object
+    # A human-readable identifier for the validator.
+    id*: string
+    # The validator voting pubkey.
+    pubkey*: CookedPubKey
+    # The validator index in the state.
+    index*: Option[uint64]
+    # A history of the validator over time.
+    summaries*: SummaryMap
+
+  ValidatorMonitor* = object
+    # The validators that require additional monitoring.
+    validators*: Table[CookedPubKey, MonitoredValidator]
+    # A map of validator index to a validator public key.
+    indices*: Table[uint64, CookedPubKey]
 
 func shortLog*(v: AttachedValidator): string = shortLog(v.pubKey)

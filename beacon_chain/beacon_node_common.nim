@@ -63,6 +63,7 @@ type
     consensusManager*: ref ConsensusManager
     attachedValidatorBalanceTotal*: uint64
     gossipState*: GossipState
+    validatorMonitor*: ValidatorMonitor
 
 const
   MaxEmptySlotCount* = uint64(10*60) div SECONDS_PER_SLOT
