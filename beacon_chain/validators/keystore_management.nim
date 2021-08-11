@@ -277,7 +277,8 @@ proc loadKeystore*(validatorsDir, secretsDir, keyName: string,
   else:
     return
 
-iterator validatorKeysFromDirs*(validatorsDir, secretsDir: string): ValidatorPrivKey =
+iterator validatorKeysFromDirs*(validatorsDir,
+                                secretsDir: string): ValidatorPrivKey =
   try:
     for kind, file in walkDir(validatorsDir):
       if kind == pcDir:
@@ -290,13 +291,14 @@ iterator validatorKeysFromDirs*(validatorsDir, secretsDir: string): ValidatorPri
   except OSError:
     quit 1
 
-iterator validatorKeys*(config: BeaconNodeConf|ValidatorClientConf): ValidatorPrivKey =
+iterator validatorKeys*(config: AnyConf): ValidatorPrivKey =
   let validatorsDir = config.validatorsDir
   try:
     for kind, file in walkDir(validatorsDir):
       if kind == pcDir:
         let keyName = splitFile(file).name
-        let key = loadKeystore(validatorsDir, config.secretsDir, keyName, config.nonInteractive)
+        let key = loadKeystore(validatorsDir, config.secretsDir, keyName,
+                               config.nonInteractive)
         if key.isSome:
           yield key.get
         else:
