@@ -205,16 +205,16 @@ type
     # A human-readable identifier for the validator.
     id*: string
     # The validator voting pubkey.
-    pubkey*: CookedPubKey
+    pubkey*: ValidatorPubKey
     # The validator index in the state.
-    index*: Option[uint64]
+    index*: Option[ValidatorIndex]
     # A history of the validator over time.
     summaries*: SummaryMap
 
   ValidatorMonitor* = object
     # The validators that require additional monitoring.
-    validators*: Table[CookedPubKey, MonitoredValidator]
+    validators*: Table[ValidatorPubKey, MonitoredValidator]
     # A map of validator index to a validator public key.
-    indices*: Table[uint64, CookedPubKey]
+    indices*: Table[ValidatorIndex, ValidatorPubKey]
 
 func shortLog*(v: AttachedValidator): string = shortLog(v.pubKey)
